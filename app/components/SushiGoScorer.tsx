@@ -5,7 +5,6 @@ import React, { useState, useEffect } from 'react';
 
 const SushiGoScorer = () => {
   const [players, setPlayers] = useState<Array<{ name: string, scores: number[] }>>(() => {
-    // Only access localStorage on client side
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('sushiGoPlayers');
       return saved ? JSON.parse(saved) : [{ name: 'Player 1', scores: [0, 0, 0] }];
@@ -70,19 +69,19 @@ const SushiGoScorer = () => {
   };
 
   return (
-    <div className="container py-4">
+    <div className="container-fluid px-2 py-2">
       {showConfirmation && (
-        <div className="alert alert-warning alert-dismissible fade show" role="alert">
-          <strong>Remove player?</strong> This action cannot be undone.
+        <div className="alert alert-warning mb-2 p-2" role="alert">
+          <strong>Remove player?</strong>
           <div className="mt-2">
             <button
-              className="btn btn-danger me-2"
+              className="btn btn-danger btn-sm me-2"
               onClick={confirmRemovePlayer}
             >
               Remove
             </button>
             <button
-              className="btn btn-secondary"
+              className="btn btn-secondary btn-sm"
               onClick={cancelRemovePlayer}
             >
               Cancel
@@ -91,82 +90,70 @@ const SushiGoScorer = () => {
         </div>
       )}
 
-      <div className="card shadow">
-        <div className="card-header bg-primary text-white">
-          <div className="d-flex justify-content-between align-items-center">
-            <h4 className="mb-0">Sushi Go Score Tracker</h4>
-            <div>
-              <button
-                className="btn btn-outline-light me-2"
-                onClick={resetScores}
-              >
-                Reset
-              </button>
-              <button
-                className="btn btn-light"
-                onClick={addPlayer}
-              >
-                <i className="bi bi-plus"></i> Add Player
-              </button>
-            </div>
+      <div className="card">
+        <div className="card-header bg-primary text-white p-2">
+          <h5 className="mb-2">Sushi Go Score Tracker</h5>
+          <div className="d-flex gap-2">
+            <button
+              className="btn btn-outline-light btn-sm"
+              onClick={resetScores}
+            >
+              <i className="bi bi-arrow-counterclockwise"></i> Reset
+            </button>
+            <button
+              className="btn btn-light btn-sm"
+              onClick={addPlayer}
+            >
+              <i className="bi bi-plus"></i> Add Player
+            </button>
           </div>
         </div>
-        <div className="card-body">
-          <div className="table-responsive">
-            <table className="table table-hover">
-              <thead>
-                <tr>
-                  <th className="text-start">Player</th>
-                  <th className="text-center">Round 1</th>
-                  <th className="text-center">Round 2</th>
-                  <th className="text-center">Round 3</th>
-                  <th className="text-center">Total</th>
-                  <th className="text-center">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {players.map((player, playerIndex) => (
-                  <tr key={playerIndex}>
-                    <td>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={player.name}
-                        onChange={(e) => updateName(playerIndex, e.target.value)}
-                      />
-                    </td>
-                    {player.scores.map((score, roundIndex) => (
-                      <td key={roundIndex}>
-                        <input
-                          type="number"
-                          className="form-control text-center mx-auto"
-                          style={{ maxWidth: '80px' }}
-                          value={score}
-                          min="0"
-                          onChange={(e) => updateScore(playerIndex, roundIndex, e.target.value)}
-                        />
-                      </td>
-                    ))}
-                    <td className="text-center fw-bold">
-                      {calculateTotal(player.scores)}
-                    </td>
-                    <td className="text-center">
-                      {players.length > 1 && (
-                        <button
-                          className="btn btn-danger"
-                          onClick={() => initiateRemovePlayer(playerIndex)}
-                          title="Remove Player"
-                        >
-                          <i className="bi bi-trash me-1"></i>
-                          Remove
-                        </button>
-                      )}
-                    </td>
-                  </tr>
+
+        <div className="card-body p-2">
+          {players.map((player, playerIndex) => (
+            <div key={playerIndex} className="mb-3 p-2 border rounded">
+              <div className="d-flex gap-2 align-items-center mb-2">
+                <input
+                  type="text"
+                  className="form-control form-control-sm"
+                  value={player.name}
+                  onChange={(e) => updateName(playerIndex, e.target.value)}
+                  style={{ maxWidth: '120px' }}
+                />
+                {players.length > 1 && (
+                  <button
+                    className="btn btn-outline-danger btn-sm"
+                    onClick={() => initiateRemovePlayer(playerIndex)}
+                  >
+                    <i className="bi bi-trash"></i>
+                  </button>
+                )}
+              </div>
+
+              <div className="d-flex gap-2 align-items-center">
+                {player.scores.map((score, roundIndex) => (
+                  <div key={roundIndex} className="flex-grow-1">
+                    <label className="form-label small mb-1">
+                      Round {roundIndex + 1}
+                    </label>
+                    <input
+                      type="number"
+                      className="form-control form-control-sm text-center"
+                      value={score}
+                      min="0"
+                      onChange={(e) => updateScore(playerIndex, roundIndex, e.target.value)}
+                    />
+                  </div>
                 ))}
-              </tbody>
-            </table>
-          </div>
+                <div className="flex-grow-1">
+                  <label className="form-label small mb-1">Total</label>
+                  <div className="form-control form-control-sm text-center bg-light">
+                    {calculateTotal(player.scores)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
